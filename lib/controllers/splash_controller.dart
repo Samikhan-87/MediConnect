@@ -9,6 +9,16 @@ class SplashController {
     if (!context.mounted) return;
 
     final prefs = await SharedPreferences.getInstance();
+    
+    // Check if user is already logged in
+    final currentUser = prefs.getString('current_user');
+    if (currentUser != null) {
+      if (!context.mounted) return;
+      Navigator.of(context).pushReplacementNamed(AppRouter.home);
+      return;
+    }
+    
+    // Check onboarding status
     final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
 
     if (!context.mounted) return;

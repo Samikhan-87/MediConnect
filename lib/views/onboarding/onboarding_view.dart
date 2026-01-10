@@ -120,9 +120,16 @@ class _BottomContentPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF1A3A5C), // Dark teal-blue color
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF064564),
+            Color(0xFF006DA4),
+          ],
+        ),
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
         ),

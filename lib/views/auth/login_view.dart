@@ -43,13 +43,8 @@ class _LoginViewState extends State<LoginView> {
       });
 
       if (success) {
-        // TODO: Navigate to home screen when implemented
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login successful!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        if (!context.mounted) return;
+        Navigator.of(context).pushReplacementNamed(AppRouter.home);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -64,15 +59,25 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF003366), // Dark blue background
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF064564),
+              Color(0xFF006DA4),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                 const SizedBox(height: 60),
                 // Title
                 const Text(
@@ -188,7 +193,8 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ],
                 ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

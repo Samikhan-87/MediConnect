@@ -76,8 +76,16 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        // Dark blue background as shown in the design
-        color: const Color(0xFF1A3A5C), // Dark teal/blue color
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF064564),
+              Color(0xFF006DA4),
+            ],
+          ),
+        ),
         child: Center(
           child: AnimatedBuilder(
             animation: _animationController,

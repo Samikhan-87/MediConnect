@@ -118,13 +118,24 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF003366), // Dark blue background
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: _emailVerified
-              ? _buildPasswordChangeForm()
-              : _buildEmailVerificationForm(),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF064564),
+              Color(0xFF006DA4),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: _emailVerified
+                ? _buildPasswordChangeForm()
+                : _buildEmailVerificationForm(),
+          ),
         ),
       ),
     );
