@@ -211,13 +211,21 @@ class _HomeViewState extends State<HomeView> {
               final center = medicalCenters[index];
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    children: [
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(context).pushNamed(
+                      AppRouter.medicalCenterDetails,
+                      arguments: center,
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: [
                       Expanded(
                         flex: 2,
                         child: Padding(
@@ -266,7 +274,8 @@ class _HomeViewState extends State<HomeView> {
                           ),
                         ),
                       ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               );

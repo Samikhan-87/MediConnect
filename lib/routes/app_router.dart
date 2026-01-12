@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mediconnect/models/medical_center_model.dart';
 import 'package:mediconnect/views/auth/forgot_password_view.dart';
 import 'package:mediconnect/views/auth/login_view.dart';
 import 'package:mediconnect/views/auth/signup_view.dart';
 import 'package:mediconnect/views/home/home_view.dart';
+import 'package:mediconnect/views/medical_center/medical_center_details_view.dart';
 import 'package:mediconnect/views/notifications/notifications_view.dart';
 import 'package:mediconnect/views/onboarding/onboarding_view.dart';
 import 'package:mediconnect/views/splash/splash_view.dart';
@@ -15,6 +17,7 @@ class AppRouter {
   static const String forgotPassword = '/forgot-password';
   static const String home = '/home';
   static const String notifications = '/notifications';
+  static const String medicalCenterDetails = '/medical-center-details';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -32,6 +35,11 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const HomeView());
       case notifications:
         return MaterialPageRoute(builder: (_) => const NotificationsView());
+      case medicalCenterDetails:
+        final medicalCenter = settings.arguments as MedicalCenterModel;
+        return MaterialPageRoute(
+          builder: (_) => MedicalCenterDetailsView(medicalCenter: medicalCenter),
+        );
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

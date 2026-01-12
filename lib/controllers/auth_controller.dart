@@ -1,153 +1,181 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class AuthController {
-  // Keys for SharedPreferences
-  static const String _usersKey = 'users';
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  
+  // Keys for SharedPreferences (for storing current user session)
   static const String _currentUserKey = 'current_user';
 
-  // Login - Using SharedPreferences (Local Memory)
-  Future<bool> login(String email, String password) async {
+  // Login - Using Firebase Authentication
+  // Returns null on success, error message on failure
+  Future<String?> login(String email, String password) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final usersJson = prefs.getString(_usersKey);
-      
-      if (usersJson == null) {
-        return false; // No users registered
-      }
-      
-      final List<dynamic> users = json.decode(usersJson);
-      
-      // Find user with matching email and password
-      for (var user in users) {
-        if (user['email'] == email && user['password'] == password) {
-          // Save current user session
-          await prefs.setString(_currentUserKey, json.encode(user));
-          return true;
+      // Sign in with Firebase Auth
+      final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
+
+      if (userCredential.user != null) {
+        // Get user data from Firestore
+        final userDoc = await _firestore
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .get();
+
+        if (userDoc.exists) {
+          final userData = userDoc.data()!;
+          // Save current user session to SharedPreferences for quick access
+          final currentUser = {
+            'uid': userCredential.user!.uid,
+            'name': userData['name'],
+            'email': userData['email'],
+            'phone': userData['phone'],
+          };
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString(_currentUserKey, json.encode(currentUser));
         }
+        return null; // Success
       }
-      
-      return false; // Invalid credentials
+      return 'Login failed. Please try again.';
+    } on FirebaseAuthException catch (e) {
+      // Handle specific Firebase Auth errors
+      return _getErrorMessage(e.code);
     } catch (e) {
-      return false;
+      print('Login error: $e');
+      return 'An unexpected error occurred. Please try again.';
     }
   }
 
-  // Sign Up - Using SharedPreferences (Local Memory)
-  Future<bool> signUp({
+  // Sign Up - Using Firebase Authentication
+  // Returns null on success, error message on failure
+  Future<String?> signUp({
     required String name,
     required String email,
     required String phone,
     required String password,
   }) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final usersJson = prefs.getString(_usersKey);
-      
-      List<dynamic> users = [];
-      if (usersJson != null) {
-        users = json.decode(usersJson);
+      // Create user with Firebase Auth
+      final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
+
+      if (userCredential.user != null) {
+        // Save additional user data to Firestore
+        await _firestore.collection('users').doc(userCredential.user!.uid).set({
+          'name': name,
+          'email': email.trim(),
+          'phone': phone.trim(),
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        // Save current user session to SharedPreferences
+        final currentUser = {
+          'uid': userCredential.user!.uid,
+          'name': name,
+          'email': email.trim(),
+          'phone': phone.trim(),
+        };
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(_currentUserKey, json.encode(currentUser));
+
+        return null; // Success
       }
-      
-      // Check if email already exists
-      for (var user in users) {
-        if (user['email'] == email) {
-          return false; // Email already registered
-        }
-      }
-      
-      // Create new user
-      final newUser = {
-        'name': name,
-        'email': email,
-        'phone': phone,
-        'password': password,
-        'createdAt': DateTime.now().toIso8601String(),
-      };
-      
-      users.add(newUser);
-      
-      // Save users list
-      await prefs.setString(_usersKey, json.encode(users));
-      
-      // Save current user session
-      await prefs.setString(_currentUserKey, json.encode(newUser));
-      
-      return true;
+      return 'Sign up failed. Please try again.';
+    } on FirebaseAuthException catch (e) {
+      // Handle specific Firebase Auth errors
+      return _getErrorMessage(e.code);
     } catch (e) {
-      return false;
+      print('Sign up error: $e');
+      return 'An unexpected error occurred. Please try again.';
     }
   }
 
-  // Change Password - Using SharedPreferences (Local Memory)
+  // Helper method to get user-friendly error messages
+  String _getErrorMessage(String errorCode) {
+    switch (errorCode) {
+      case 'user-not-found':
+        return 'No account found with this email. Please sign up first.';
+      case 'wrong-password':
+        return 'Incorrect password. Please try again.';
+      case 'email-already-in-use':
+        return 'An account already exists with this email. Please use a different email or sign in.';
+      case 'weak-password':
+        return 'Password is too weak. Please use a stronger password.';
+      case 'invalid-email':
+        return 'Invalid email address. Please enter a valid email.';
+      case 'user-disabled':
+        return 'This account has been disabled. Please contact support.';
+      case 'too-many-requests':
+        return 'Too many failed attempts. Please try again later.';
+      case 'operation-not-allowed':
+        return 'Email/password authentication is not enabled. Please contact support.';
+      case 'network-request-failed':
+        return 'Network error. Please check your internet connection.';
+      default:
+        return 'Authentication failed. Please try again.';
+    }
+  }
+
+  // Change Password - Using Firebase Authentication
   Future<bool> changePassword({
     required String email,
     required String newPassword,
   }) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final usersJson = prefs.getString(_usersKey);
-      
-      if (usersJson == null) {
+      final user = _auth.currentUser;
+      if (user == null) {
         return false;
       }
-      
-      List<dynamic> users = json.decode(usersJson);
-      
-      // Find and update user password
-      bool found = false;
-      for (int i = 0; i < users.length; i++) {
-        if (users[i]['email'] == email) {
-          users[i]['password'] = newPassword;
-          found = true;
-          break;
-        }
-      }
-      
-      if (!found) {
-        return false;
-      }
-      
-      // Save updated users list
-      await prefs.setString(_usersKey, json.encode(users));
-      
-      // Update current user session if it's the same user
-      final currentUserJson = prefs.getString(_currentUserKey);
-      if (currentUserJson != null) {
-        final currentUser = json.decode(currentUserJson);
-        if (currentUser['email'] == email) {
-          currentUser['password'] = newPassword;
-          await prefs.setString(_currentUserKey, json.encode(currentUser));
-        }
-      }
-      
+
+      // Update password in Firebase Auth
+      await user.updatePassword(newPassword);
       return true;
+    } on FirebaseAuthException catch (e) {
+      print('Change password error: ${e.code} - ${e.message}');
+      return false;
     } catch (e) {
+      print('Change password error: $e');
       return false;
     }
   }
 
-  // Forgot Password - Check if email exists
+  // Forgot Password - Send password reset email using Firebase
   Future<bool> checkEmailExists(String email) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final usersJson = prefs.getString(_usersKey);
-      
-      if (usersJson == null) {
-        return false;
-      }
-      
-      final List<dynamic> users = json.decode(usersJson);
-      
-      for (var user in users) {
-        if (user['email'] == email) {
-          return true;
-        }
-      }
-      
+      // Firebase doesn't directly allow checking if email exists for security
+      // Instead, we'll try to send a password reset email
+      // If email doesn't exist, Firebase will handle it gracefully
+      await _auth.sendPasswordResetEmail(email: email.trim());
+      return true; // Email sent successfully (or email doesn't exist, but we don't reveal that)
+    } on FirebaseAuthException catch (e) {
+      // If email doesn't exist, Firebase will throw an exception
+      // For security reasons, we return true anyway to not reveal if email exists
+      print('Password reset error: ${e.code} - ${e.message}');
+      return true; // Return true to not reveal if email exists
+    } catch (e) {
+      print('Password reset error: $e');
+      return false;
+    }
+  }
+
+  // Send password reset email
+  Future<bool> sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+      return true;
+    } on FirebaseAuthException catch (e) {
+      print('Password reset error: ${e.code} - ${e.message}');
       return false;
     } catch (e) {
+      print('Password reset error: $e');
       return false;
     }
   }
@@ -170,8 +198,20 @@ class AuthController {
 
   // Logout
   Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_currentUserKey);
+    try {
+      // Sign out from Firebase
+      await _auth.signOut();
+      // Clear local session
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_currentUserKey);
+    } catch (e) {
+      print('Logout error: $e');
+    }
+  }
+
+  // Get current Firebase user
+  User? getCurrentFirebaseUser() {
+    return _auth.currentUser;
   }
 
   // Validation methods

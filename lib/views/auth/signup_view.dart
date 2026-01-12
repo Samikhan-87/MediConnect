@@ -36,7 +36,7 @@ class _SignUpViewState extends State<SignUpView> {
         _isLoading = true;
       });
 
-      final success = await _controller.signUp(
+      final errorMessage = await _controller.signUp(
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
         phone: _phoneController.text.trim(),
@@ -49,7 +49,9 @@ class _SignUpViewState extends State<SignUpView> {
         _isLoading = false;
       });
 
-      if (success) {
+      if (errorMessage == null) {
+        // Success
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Account created successfully!'),
@@ -58,9 +60,11 @@ class _SignUpViewState extends State<SignUpView> {
         );
         Navigator.of(context).pushReplacementNamed(AppRouter.login);
       } else {
+        // Show error message
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Email already exists. Please use a different email.'),
+          SnackBar(
+            content: Text(errorMessage),
             backgroundColor: Colors.red,
           ),
         );

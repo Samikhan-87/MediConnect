@@ -31,7 +31,7 @@ class _LoginViewState extends State<LoginView> {
         _isLoading = true;
       });
 
-      final success = await _controller.login(
+      final errorMessage = await _controller.login(
         _emailController.text.trim(),
         _passwordController.text,
       );
@@ -42,13 +42,16 @@ class _LoginViewState extends State<LoginView> {
         _isLoading = false;
       });
 
-      if (success) {
+      if (errorMessage == null) {
+        // Success
         if (!context.mounted) return;
         Navigator.of(context).pushReplacementNamed(AppRouter.home);
       } else {
+        // Show error message
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Invalid email or password. Please try again.'),
+          SnackBar(
+            content: Text(errorMessage),
             backgroundColor: Colors.red,
           ),
         );

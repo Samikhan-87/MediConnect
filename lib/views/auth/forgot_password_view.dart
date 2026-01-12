@@ -36,7 +36,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
         _isLoading = true;
       });
 
-      final emailExists = await _controller.checkEmailExists(
+      final success = await _controller.sendPasswordResetEmail(
         _emailController.text.trim(),
       );
 
@@ -44,16 +44,28 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
 
       setState(() {
         _isLoading = false;
-        if (emailExists) {
-          _emailVerified = true;
-          _userEmail = _emailController.text.trim();
-        }
       });
 
-      if (!emailExists) {
+      if (success) {
+        // Show success message
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Email not found. Please check and try again.'),
+            content: Text('Password reset email sent! Please check your inbox.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Navigate back to login after a short delay
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) {
+            Navigator.of(context).pop();
+          }
+        });
+      } else {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to send reset email. Please try again.'),
             backgroundColor: Colors.red,
           ),
         );
@@ -132,9 +144,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
-            child: _emailVerified
-                ? _buildPasswordChangeForm()
-                : _buildEmailVerificationForm(),
+            child: _buildEmailVerificationForm(),
           ),
         ),
       ),
@@ -161,7 +171,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
           const SizedBox(height: 12),
           // Description
           Text(
-            'Please enter your email address to reset your password.',
+            'Please enter your email address and we will send you a password reset link.',
             style: TextStyle(
               fontSize: 14,
               color: Colors.white.withOpacity(0.9),
