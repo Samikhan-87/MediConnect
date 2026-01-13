@@ -132,26 +132,27 @@ class MedicalCenterDetailsView extends StatelessWidget {
   }
 
   Widget _buildImage() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Container(
-        height: 250,
-        decoration: BoxDecoration(
-          color: Colors.grey[300],
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: medicalCenter.imagePath.isNotEmpty
-              ? Image.asset(
-                  medicalCenter.imagePath,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return _buildPlaceholderImage();
-                  },
-                )
-              : _buildPlaceholderImage(),
-        ),
+    return Container(
+      width: double.infinity,
+      height: 250,
+      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: medicalCenter.imagePath.isNotEmpty
+            ? Image.asset(
+                medicalCenter.imagePath,
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+                errorBuilder: (context, error, stackTrace) {
+                  return _buildPlaceholderImage();
+                },
+              )
+            : _buildPlaceholderImage(),
       ),
     );
   }
@@ -159,10 +160,12 @@ class MedicalCenterDetailsView extends StatelessWidget {
   Widget _buildPlaceholderImage() {
     return Container(
       color: Colors.grey[300],
-      child: const Icon(
-        Icons.local_hospital,
-        size: 80,
-        color: Colors.grey,
+      child: const Center(
+        child: Icon(
+          Icons.local_hospital,
+          size: 80,
+          color: Colors.grey,
+        ),
       ),
     );
   }

@@ -84,9 +84,13 @@ class _OnboardingPage extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: double.infinity,
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).size.height * 0.35,
+      ),
       child: Image.asset(
         data.imagePath,
         fit: BoxFit.cover,
+        alignment: Alignment.topCenter,
         errorBuilder: (context, error, stackTrace) {
           return Container(
             color: Colors.grey[300],
@@ -142,7 +146,7 @@ class _BottomContentPanel extends StatelessWidget {
           Text(
             data.title,
             style: const TextStyle(
-              fontSize: 28,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),

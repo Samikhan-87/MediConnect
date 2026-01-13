@@ -43,12 +43,8 @@ class _LoginViewState extends State<LoginView> {
       });
 
       if (errorMessage == null) {
-        // Success
-        if (!context.mounted) return;
         Navigator.of(context).pushReplacementNamed(AppRouter.home);
       } else {
-        // Show error message
-        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(errorMessage),
@@ -62,7 +58,10 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -75,128 +74,143 @@ class _LoginViewState extends State<LoginView> {
         ),
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                const SizedBox(height: 60),
-                // Title
-                const Text(
-                  'Sign In',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                // Subtitle
-                Text(
-                  'Welcome! Please enter your email and password to gain access.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 48),
-                // Email Field
-                CustomTextField(
-                  label: 'Email',
-                  hint: 'Enter Your Email',
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  validator: _controller.validateEmail,
-                ),
-                const SizedBox(height: 24),
-                // Password Field
-                CustomTextField(
-                  label: 'Password',
-                  hint: 'Enter Your Password',
-                  controller: _passwordController,
-                  obscureText: true,
-                  validator: _controller.validatePassword,
-                ),
-                const SizedBox(height: 12),
-                // Forgot Password Link
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed(AppRouter.forgotPassword);
-                    },
-                    child: const Text(
-                      'Forget Password',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 60),
+
+                      // Title
+                      const Text(
+                        'Sign In',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 32),
-                // Sign In Button
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _handleLogin,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF003366),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Color(0xFF003366),
+
+                      const SizedBox(height: 12),
+
+                      // Subtitle
+                      Text(
+                        'Welcome! Please enter your email and password to gain access.',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+
+                      const SizedBox(height: 48),
+
+                      // Email
+                      CustomTextField(
+                        label: 'Email',
+                        hint: 'Enter Your Email',
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: _controller.validateEmail,
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Password
+                      CustomTextField(
+                        label: 'Password',
+                        hint: 'Enter Your Password',
+                        controller: _passwordController,
+                        obscureText: true,
+                        validator: _controller.validatePassword,
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // Forgot password
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.of(context)
+                                .pushNamed(AppRouter.forgotPassword);
+                          },
+                          child: const Text(
+                            'Forget Password',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      // Sign in button
+                      ElevatedButton(
+                        onPressed: _isLoading ? null : _handleLogin,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: const Color(0xFF003366),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: _isLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor:
+                                      AlwaysStoppedAnimation<Color>(
+                                          Color(0xFF003366)),
+                                ),
+                              )
+                            : const Text(
+                                'Sign In',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Sign up
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Don't have an account? ",
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.9),
                             ),
                           ),
-                        )
-                      : const Text(
-                          'Sign In',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pushNamed(AppRouter.signup);
+                            },
+                            child: const Text(
+                              'Sign Up',
+                              style: TextStyle(
+                                color: Color(0xFF4A9EFF),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
-                        ),
-                ),
-                const SizedBox(height: 24),
-                // Sign Up Link
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Don't have an account? ",
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 14,
+                        ],
                       ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pushNamed(AppRouter.signup);
-                      },
-                      child: const Text(
-                        'Sign Up',
-                        style: TextStyle(
-                          color: Color(0xFF4A9EFF), // Bright blue
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                ],
               ),
             ),
           ),
