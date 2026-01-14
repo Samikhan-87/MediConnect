@@ -44,7 +44,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     final medicalCenters = MedicalCenterModel.getMedicalCenters();
-    final doctors = DoctorModel.getTopRatedDoctors();
+    final topDoctors = DoctorModel.getTopRatedDoctors().where((d) => d.rating >= 4.0).toList();
 
     return Scaffold(
       key: _scaffoldKey,
@@ -65,13 +65,13 @@ class _HomeViewState extends State<HomeView> {
             children: [
               // Top Section with Profile, Welcome Message, and Icons
               _buildHeaderSection(),
-              
+
               // Medical Center Carousel Section
               _buildMedicalCenterSection(medicalCenters),
-              
+
               // Top Rated Doctors Section
               Expanded(
-                child: _buildDoctorsSection(doctors),
+                child: _buildDoctorsSection(topDoctors),
               ),
             ],
           ),
@@ -81,241 +81,244 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
- Widget _buildHeaderSection() {
-  return Padding(
-    padding: const EdgeInsets.all(16.0),
-    child: Column(
-      children: [
-        // Profile and Welcome Section
-        Row(
-          children: [
-            // Profile Picture
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
-              ),
-              child: ClipOval(
-                child: Image.asset(
-                'assets\images\ChatGPT Image Jul 25, 2025, 03_35_38 PM.png',
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    // Fallback to icon if image fails to load
-                    return Container(
-                      color: Colors.white.withOpacity(0.2),
-                      child: const Icon(
-                        Icons.person,
-                        color: Colors.white,
-                        size: 30,
-                      ),
-                    );
-                  },
+  Widget _buildHeaderSection() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          // Profile and Welcome Section
+          Row(
+            children: [
+              // Profile Picture
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                      color: Colors.white.withOpacity(0.3), width: 2),
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/MediCenterImages/Rectangle 1494.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      // Fallback to icon if image fails to load
+                      return Container(
+                        color: Colors.white.withOpacity(0.2),
+                        child: const Icon(
+                          Icons.person,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
-            // Welcome Text
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Hi, Welcome Back',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
+              const SizedBox(width: 12),
+              // Welcome Text
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Hi, Welcome Back',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _userName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Notification Bell
+              Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined,
+                        color: Colors.white),
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(AppRouter.notifications);
+                    },
                   ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Sami Khan',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  Positioned(
+                    right: 12,
+                    top: 12,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
-            // Notification Bell
-            Stack(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.notifications_outlined, color: Colors.white),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(AppRouter.notifications);
+              // Hamburger Menu
+              IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white),
+                onPressed: () {
+                  _scaffoldKey.currentState?.openEndDrawer();
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMedicalCenterSection(List<MedicalCenterModel> medicalCenters) {
+    if (medicalCenters.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          height: 200,
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: medicalCenters.length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPageIndex = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              final center = medicalCenters[index];
+              return Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(context).pushNamed(
+                      AppRouter.medicalCenterDetails,
+                      arguments: center,
+                    );
                   },
-                ),
-                Positioned(
-                  right: 12,
-                  top: 12,
+                  borderRadius: BorderRadius.circular(20),
                   child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  center.name,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF003366),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  center.description,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                    height: 1.4,
+                                  ),
+                                  maxLines: 4,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topRight: Radius.circular(20),
+                              bottomRight: Radius.circular(20),
+                            ),
+                            child: center.imagePath.isNotEmpty
+                                ? Image.asset(
+                                    center.imagePath,
+                                    fit: BoxFit.cover,
+                                    height: double.infinity,
+                                    width: double.infinity,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        color: Colors.grey[200],
+                                        child: const Center(
+                                          child: Icon(
+                                            Icons.local_hospital,
+                                            size: 60,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  )
+                                : Container(
+                                    color: Colors.grey[200],
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.local_hospital,
+                                        size: 60,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
-            // Hamburger Menu
-            IconButton(
-              icon: const Icon(Icons.menu, color: Colors.white),
-              onPressed: () {
-                _scaffoldKey.currentState?.openEndDrawer();
-              },
-            ),
-          ],
+              );
+            },
+          ),
         ),
-      ],
-    ),
-  );
-}
-
-  Widget _buildMedicalCenterSection(List<MedicalCenterModel> medicalCenters) {
-  if (medicalCenters.isEmpty) return const SizedBox.shrink();
-
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      SizedBox(
-        height: 200,
-        child: PageView.builder(
-          controller: _pageController,
-          itemCount: medicalCenters.length,
-          onPageChanged: (index) {
-            setState(() {
-              _currentPageIndex = index;
-            });
-          },
-          itemBuilder: (context, index) {
-            final center = medicalCenters[index];
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: InkWell(
-                onTap: () {
-                  Navigator.of(context).pushNamed(
-                    AppRouter.medicalCenterDetails,
-                    arguments: center,
-                  );
-                },
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                center.name,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF003366),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                center.description,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
-                                  height: 1.4,
-                                ),
-                                maxLines: 4,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            topRight: Radius.circular(20),
-                            bottomRight: Radius.circular(20),
-                          ),
-                          child: center.imagePath.isNotEmpty
-                              ? Image.asset(
-                                  center.imagePath,
-                                  fit: BoxFit.cover,
-                                  height: double.infinity,
-                                  width: double.infinity,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      color: Colors.grey[200],
-                                      child: const Center(
-                                        child: Icon(
-                                          Icons.local_hospital,
-                                          size: 60,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                )
-                              : Container(
-                                  color: Colors.grey[200],
-                                  child: const Center(
-                                    child: Icon(
-                                      Icons.local_hospital,
-                                      size: 60,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                        ),
-                      ),
-                    ],
-                  ),
+        // Page Indicator Dots
+        Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              medicalCenters.length,
+              (index) => Container(
+                width: _currentPageIndex == index ? 12 : 6,
+                height: 6,
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(3),
+                  color: _currentPageIndex == index
+                      ? Colors.white
+                      : Colors.white.withOpacity(0.4),
                 ),
-              ),
-            );
-          },
-        ),
-      ),
-      // Page Indicator Dots
-      Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-            medicalCenters.length,
-            (index) => Container(
-              width: _currentPageIndex == index ? 12 : 6,
-              height: 6,
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(3),
-                color: _currentPageIndex == index
-                    ? Colors.white
-                    : Colors.white.withOpacity(0.4),
               ),
             ),
           ),
         ),
-      ),
-      const SizedBox(height: 16),
-    ],
-  );
-}
+        const SizedBox(height: 16),
+      ],
+    );
+  }
 
-  Widget _buildDoctorsSection(List<DoctorModel> doctors) {
+  Widget _buildDoctorsSection(List<DoctorModel> topDoctors) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -333,9 +336,9 @@ class _HomeViewState extends State<HomeView> {
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            itemCount: doctors.length,
+            itemCount: topDoctors.length,
             itemBuilder: (context, index) {
-              final doctor = doctors[index];
+              final doctor = topDoctors[index];
               return _buildDoctorCard(doctor);
             },
           ),
@@ -344,144 +347,144 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
- Widget _buildDoctorCard(DoctorModel doctor) {
-  return Container(
-    margin: const EdgeInsets.only(bottom: 16),
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.grey.withOpacity(0.1),
-          spreadRadius: 1,
-          blurRadius: 5,
-          offset: const Offset(0, 2),
-        ),
-      ],
-    ),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Doctor Image
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.grey[200],
+  Widget _buildDoctorCard(DoctorModel doctor) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: const Offset(0, 2),
           ),
-          child: ClipOval(
-            child: doctor.imagePath.isNotEmpty
-                ? Image.asset(
-                    doctor.imagePath,
-                    fit: BoxFit.cover,
-                    width: 80,
-                    height: 80,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.grey[200],
-                        child: const Icon(
-                          Icons.person,
-                          size: 40,
-                          color: Colors.grey,
-                        ),
-                      );
-                    },
-                  )
-                : const Icon(
-                    Icons.person,
-                    size: 40,
-                    color: Colors.grey,
-                  ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        // Doctor Info
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                doctor.name,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF003366),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                doctor.specialty,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                doctor.description,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                  height: 1.4,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.star,
-                        color: Colors.amber,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${doctor.rating}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ],
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Navigate to doctor details
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF006DA4),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 8,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      elevation: 0,
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Doctor Image
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.grey[200],
+            ),
+            child: ClipOval(
+              child: doctor.imagePath.isNotEmpty
+                  ? Image.asset(
+                      doctor.imagePath,
+                      fit: BoxFit.cover,
+                      width: 80,
+                      height: 80,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[200],
+                          child: const Icon(
+                            Icons.person,
+                            size: 40,
+                            color: Colors.grey,
+                          ),
+                        );
+                      },
+                    )
+                  : const Icon(
+                      Icons.person,
+                      size: 40,
+                      color: Colors.grey,
                     ),
-                    child: const Text(
-                      'View Details',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+          const SizedBox(width: 16),
+          // Doctor Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  doctor.name,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF003366),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  doctor.specialty,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  doctor.description,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                    height: 1.4,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.star,
+                          color: Colors.amber,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${doctor.rating}',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(AppRouter.doctorDetails, arguments: doctor);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF006DA4),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'View Details',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildBottomNavigationBar() {
     return Container(
@@ -503,6 +506,11 @@ class _HomeViewState extends State<HomeView> {
       child: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
+          if (index == 1) {
+            // Open the full doctors listing screen with filters
+            Navigator.of(context).pushNamed(AppRouter.allDoctors);
+            return;
+          }
           setState(() {
             _currentIndex = index;
           });
@@ -559,119 +567,120 @@ class _HomeViewState extends State<HomeView> {
             ),
           ),
           child: SafeArea(
-          child: Column(
-            children: [
-              // Header Section
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    // Profile Picture
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.2),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
-                          width: 2,
+            child: Column(
+              children: [
+                // Header Section
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      // Profile Picture
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.2),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 2,
+                          ),
                         ),
-                      ),
-                      child: const Icon(
-                        Icons.person,
-                        color: Colors.white,
-                        size: 25,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        _userName,
-                        style: const TextStyle(
+                        child: const Icon(
+                          Icons.person,
                           color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          size: 25,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _userName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const Divider(
-                color: Colors.white24,
-                height: 1,
-                thickness: 1,
-              ),
-              const SizedBox(height: 16),
-              // Menu Items
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  children: [
-                    _buildDrawerItem(
-                      icon: Icons.settings,
-                      title: 'Settings',
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        // Navigate to Settings
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                    _buildDrawerItem(
-                      icon: Icons.info,
-                      title: 'About',
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        // Navigate to About
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                    _buildDrawerItem(
-                      icon: Icons.privacy_tip,
-                      title: 'Privacy Policy',
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        // Navigate to Privacy Policy
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                    _buildDrawerItem(
-                      icon: Icons.description,
-                      title: 'Terms and Conditions',
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        // Navigate to Terms and Conditions
-                      },
-                    ),
-                  ],
+                const Divider(
+                  color: Colors.white24,
+                  height: 1,
+                  thickness: 1,
                 ),
-              ),
-              // Logout Button at Bottom
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: _buildDrawerItem(
-                  icon: Icons.logout,
-                  title: 'Logout',
-                  onTap: () async {
-                    Navigator.of(context).pop();
-                    await _authController.logout();
-                    if (!mounted) return;
-                    Navigator.of(context).pushReplacementNamed(AppRouter.login);
-                  },
+                const SizedBox(height: 16),
+                // Menu Items
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    children: [
+                      _buildDrawerItem(
+                        icon: Icons.settings,
+                        title: 'Settings',
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          // Navigate to Settings
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                      _buildDrawerItem(
+                        icon: Icons.info,
+                        title: 'About',
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          // Navigate to About
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                      _buildDrawerItem(
+                        icon: Icons.privacy_tip,
+                        title: 'Privacy Policy',
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          // Navigate to Privacy Policy
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                      _buildDrawerItem(
+                        icon: Icons.description,
+                        title: 'Terms and Conditions',
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          // Navigate to Terms and Conditions
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
+                // Logout Button at Bottom
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: _buildDrawerItem(
+                    icon: Icons.logout,
+                    title: 'Logout',
+                    onTap: () async {
+                      Navigator.of(context).pop();
+                      await _authController.logout();
+                      if (!mounted) return;
+                      Navigator.of(context)
+                          .pushReplacementNamed(AppRouter.login);
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

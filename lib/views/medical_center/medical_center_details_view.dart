@@ -37,28 +37,34 @@ class MedicalCenterDetailsView extends StatelessWidget {
                       // Medical Center Image
                       _buildImage(),
                       const SizedBox(height: 24),
-                      // Medical Center Name
+                      // Medical Center Name - CENTERED
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text(
-                          medicalCenter.name,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                        child: Center(
+                          child: Text(
+                            medicalCenter.name,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(height: 12),
-                      // Description
+                      // Description - CENTERED
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text(
-                          medicalCenter.description,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white.withOpacity(0.9),
-                            height: 1.5,
+                        child: Center(
+                          child: Text(
+                            medicalCenter.description,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white.withOpacity(0.9),
+                              height: 1.5,
+                            ),
                           ),
                         ),
                       ),

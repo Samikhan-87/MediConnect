@@ -7,7 +7,7 @@ import 'dart:convert';
 class AuthController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
   // Keys for SharedPreferences (for storing current user session)
   static const String _currentUserKey = 'current_user';
 
@@ -16,7 +16,8 @@ class AuthController {
   Future<String?> login(String email, String password) async {
     try {
       // Sign in with Firebase Auth
-      final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      final UserCredential userCredential =
+          await _auth.signInWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
@@ -61,8 +62,18 @@ class AuthController {
     required String password,
   }) async {
     try {
+      // Prevent multiple accounts with same phone number
+      final phoneTrimmed = phone.trim();
+      final phoneQuery = await _firestore
+          .collection('users')
+          .where('phone', isEqualTo: phoneTrimmed)
+          .get();
+      if (phoneQuery.docs.isNotEmpty) {
+        return 'Phone number already in use. Please use a different number.';
+      }
       // Create user with Firebase Auth
-      final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      final UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
@@ -185,11 +196,11 @@ class AuthController {
     try {
       final prefs = await SharedPreferences.getInstance();
       final currentUserJson = prefs.getString(_currentUserKey);
-      
+
       if (currentUserJson == null) {
         return null;
       }
-      
+
       return json.decode(currentUserJson);
     } catch (e) {
       return null;

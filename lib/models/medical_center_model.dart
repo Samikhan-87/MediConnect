@@ -33,15 +33,13 @@ class MedicalCenterModel {
         location: '2140 Westwood Blvd, Los Angeles, CA 90025, USA',
         phone: '+1 (310) 555-4821',
         timings: {
-          'Mon-Fri': '8:00 AM – 8:00 PM',
-          'Saturday': '9:00 AM – 5:00 PM',
-          'Sunday': 'Closed',
+          'Mon-Sun': '24-7',
         },
-        email: 'contact@sunrisehealthcare.us',
+        email: 'contact@trustedhealthcare.us',
       ),
       MedicalCenterModel(
         id: '2',
-        name: 'City Health Clinic',
+        name: 'City Health Center',
         description:
             'Comprehensive medical services with experienced professionals, providing quality care for all your health needs.',
         imagePath: 'assets/images/MedicalCenterImages/image 5.png',
@@ -49,11 +47,9 @@ class MedicalCenterModel {
         location: '123 Main Street, New York, NY 10001, USA',
         phone: '+1 (212) 555-1234',
         timings: {
-          'Mon-Fri': '7:00 AM – 7:00 PM',
-          'Saturday': '8:00 AM – 6:00 PM',
-          'Sunday': '10:00 AM – 4:00 PM',
+          'Mon-Sun': '24-7'
         },
-        email: 'info@cityhealthclinic.com',
+        email: 'info@cityhealthcenter.com',
       ),
       MedicalCenterModel(
         id: '3',
@@ -65,9 +61,7 @@ class MedicalCenterModel {
         location: '456 Health Avenue, Chicago, IL 60601, USA',
         phone: '+1 (312) 555-5678',
         timings: {
-          'Mon-Fri': '9:00 AM – 9:00 PM',
-          'Saturday': '9:00 AM – 5:00 PM',
-          'Sunday': 'Closed',
+          'Mon-Sun': '24-7'
         },
         email: 'contact@wellnessmedicalhub.com',
       ),
@@ -81,9 +75,7 @@ class MedicalCenterModel {
         location: '789 Care Boulevard, Houston, TX 77001, USA',
         phone: '+1 (713) 555-9012',
         timings: {
-          'Mon-Fri': '8:00 AM – 6:00 PM',
-          'Saturday': '9:00 AM – 3:00 PM',
-          'Sunday': 'Closed',
+        'Mon-Sun': '24-7'
         },
         email: 'info@communitycarecenter.org',
       ),
