@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mediconnect/models/appointment_model.dart';
 import 'package:mediconnect/routes/app_router.dart';
+import 'package:mediconnect/services/appointment_service.dart';
 
 class AllAppointmentsView extends StatefulWidget {
   const AllAppointmentsView({super.key});
@@ -11,6 +12,7 @@ class AllAppointmentsView extends StatefulWidget {
 
 class _AllAppointmentsViewState extends State<AllAppointmentsView> {
   final TextEditingController _searchController = TextEditingController();
+  final AppointmentService _appointmentService = AppointmentService();
   String _selectedTab = 'Current';
   final List<String> _tabs = ['Current', 'Previous'];
   int _bottomNavIndex = 2;
@@ -20,27 +22,39 @@ class _AllAppointmentsViewState extends State<AllAppointmentsView> {
   void initState() {
     super.initState();
     _searchController.addListener(() => setState(() {}));
+    _loadAppointments();
+    // Listen to appointment changes
+    _appointmentService.addListener(_onAppointmentsChanged);
+  }
+
+  void _onAppointmentsChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<void> _loadAppointments() async {
+    await _appointmentService.loadAppointments();
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _appointmentService.removeListener(_onAppointmentsChanged);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final appointments = AppointmentModel.getAppointments();
+    // Get appointments from service
+    final List<AppointmentModel> appointments = _selectedTab == 'Current'
+        ? _appointmentService.currentAppointments
+        : _appointmentService.previousAppointments;
+
     final query = _searchController.text.trim().toLowerCase();
 
-    // Filter by tab (Current/Previous)
+    // Filter appointments based on search
     List<AppointmentModel> displayed = appointments.where((a) {
-      if (_selectedTab == 'Current') {
-        if (!a.isCurrent) return false;
-      } else {
-        if (!a.isPrevious) return false;
-      }
-
       // Search filter
       if (query.isNotEmpty) {
         final inName = a.doctorName.toLowerCase().contains(query);
@@ -230,39 +244,56 @@ class _AllAppointmentsViewState extends State<AllAppointmentsView> {
               const SizedBox(height: 24),
               // Appointments List
               Expanded(
-                child: displayed.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.calendar_today_outlined,
-                              size: 60,
-                              color: Colors.white.withOpacity(0.5),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              _selectedTab == 'Current'
-                                  ? 'No upcoming appointments'
-                                  : 'No previous appointments',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
+                child: _appointmentService.isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
                         ),
                       )
-                    : Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: ListView.builder(
-                          itemCount: displayed.length,
-                          itemBuilder: (context, index) {
-                            final appointment = displayed[index];
-                            return _buildAppointmentCard(appointment);
-                          },
-                        ),
-                      ),
+                    : displayed.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.calendar_today_outlined,
+                                  size: 60,
+                                  color: Colors.white.withOpacity(0.5),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  _selectedTab == 'Current'
+                                      ? 'No upcoming appointments'
+                                      : 'No previous appointments',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.7),
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  _selectedTab == 'Current'
+                                      ? 'Book an appointment with a doctor'
+                                      : 'Your cancelled appointments will appear here',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.5),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : Container(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: ListView.builder(
+                              itemCount: displayed.length,
+                              itemBuilder: (context, index) {
+                                final appointment = displayed[index];
+                                return _buildAppointmentCard(appointment);
+                              },
+                            ),
+                          ),
               ),
             ],
           ),
@@ -485,14 +516,24 @@ class _AllAppointmentsViewState extends State<AllAppointmentsView> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       Navigator.of(dialogContext).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Appointment cancelled successfully'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
+
+                      // Cancel the appointment using the service
+                      final success = await _appointmentService
+                          .cancelAppointment(appointment.id);
+
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(success
+                                ? 'Appointment cancelled successfully'
+                                : 'Failed to cancel appointment'),
+                            backgroundColor:
+                                success ? Colors.green : Colors.red,
+                          ),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -860,7 +901,7 @@ class _AllAppointmentsViewState extends State<AllAppointmentsView> {
           } else if (index == 2) {
             // Already on appointments
           } else if (index == 3) {
-            // Profile - not implemented yet
+            Navigator.of(context).pushNamed(AppRouter.profile);
           }
         },
         type: BottomNavigationBarType.fixed,

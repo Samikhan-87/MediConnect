@@ -19,10 +19,10 @@ class _ProfileViewState extends State<ProfileView> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
   File? _profileImage;
   String? _savedImagePath;
   bool _isLoading = false;
@@ -45,12 +45,12 @@ class _ProfileViewState extends State<ProfileView> {
 
   Future<void> _loadUserData() async {
     setState(() => _isLoadingData = true);
-    
+
     try {
       // First try to get from SharedPreferences (cached data)
       final prefs = await SharedPreferences.getInstance();
       final currentUserJson = prefs.getString('current_user');
-      
+
       if (currentUserJson != null) {
         final userData = json.decode(currentUserJson);
         setState(() {
@@ -59,12 +59,13 @@ class _ProfileViewState extends State<ProfileView> {
           _phoneController.text = userData['phone'] ?? '';
         });
       }
-      
+
       // Then fetch fresh data from Firebase
       final user = _auth.currentUser;
       if (user != null) {
-        final userDoc = await _firestore.collection('users').doc(user.uid).get();
-        
+        final userDoc =
+            await _firestore.collection('users').doc(user.uid).get();
+
         if (userDoc.exists) {
           final data = userDoc.data()!;
           setState(() {
@@ -72,7 +73,7 @@ class _ProfileViewState extends State<ProfileView> {
             _emailController.text = data['email'] ?? '';
             _phoneController.text = data['phone'] ?? '';
           });
-          
+
           // Update cached data
           final updatedUser = {
             'uid': user.uid,
@@ -83,7 +84,7 @@ class _ProfileViewState extends State<ProfileView> {
           await prefs.setString('current_user', json.encode(updatedUser));
         }
       }
-      
+
       // Load profile image path
       _savedImagePath = prefs.getString('profile_image_path');
       if (_savedImagePath != null && File(_savedImagePath!).existsSync()) {
@@ -92,13 +93,13 @@ class _ProfileViewState extends State<ProfileView> {
     } catch (e) {
       debugPrint('Error loading user data: $e');
     }
-    
+
     setState(() => _isLoadingData = false);
   }
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
-    
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -219,14 +220,14 @@ class _ProfileViewState extends State<ProfileView> {
 
     try {
       final user = _auth.currentUser;
-      
+
       if (user != null) {
         // Update Firestore
         await _firestore.collection('users').doc(user.uid).update({
           'name': _nameController.text.trim(),
           'phone': _phoneController.text.trim(),
         });
-        
+
         // Update SharedPreferences cache
         final prefs = await SharedPreferences.getInstance();
         final updatedUser = {
@@ -236,7 +237,7 @@ class _ProfileViewState extends State<ProfileView> {
           'phone': _phoneController.text.trim(),
         };
         await prefs.setString('current_user', json.encode(updatedUser));
-        
+
         if (_savedImagePath != null) {
           await prefs.setString('profile_image_path', _savedImagePath!);
         }
@@ -360,7 +361,8 @@ class _ProfileViewState extends State<ProfileView> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                      icon:
+                          const Icon(Icons.arrow_back_ios, color: Colors.white),
                       onPressed: () => Navigator.pop(context),
                     ),
                     const Expanded(
@@ -375,11 +377,16 @@ class _ProfileViewState extends State<ProfileView> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 48), // Balance for back button
+                    IconButton(
+                      icon: const Icon(Icons.settings, color: Colors.white),
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(AppRouter.settings);
+                      },
+                    ),
                   ],
                 ),
               ),
-              
+
               // Content
               Expanded(
                 child: _isLoadingData
@@ -389,145 +396,153 @@ class _ProfileViewState extends State<ProfileView> {
                         ),
                       )
                     : SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Profile Image Upload
-                      Center(
-                        child: GestureDetector(
-                          onTap: _pickImage,
-                          child: Container(
-                            width: double.infinity,
-                            height: 180,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.3),
-                                width: 1,
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Profile Image Upload
+                            Center(
+                              child: GestureDetector(
+                                onTap: _pickImage,
+                                child: Container(
+                                  width: double.infinity,
+                                  height: 180,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.3),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: _profileImage != null
+                                      ? ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                          child: Stack(
+                                            fit: StackFit.expand,
+                                            children: [
+                                              Image.file(
+                                                _profileImage!,
+                                                fit: BoxFit.cover,
+                                                width: double.infinity,
+                                                height: double.infinity,
+                                              ),
+                                              Positioned(
+                                                bottom: 10,
+                                                right: 10,
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(8),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.camera_alt,
+                                                    color: Color(0xFF006DA4),
+                                                    size: 20,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      : Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.camera_alt_outlined,
+                                              size: 50,
+                                              color:
+                                                  Colors.white.withOpacity(0.8),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            Text(
+                                              'Upload',
+                                              style: TextStyle(
+                                                color: Colors.white
+                                                    .withOpacity(0.8),
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                ),
                               ),
                             ),
-                            child: _profileImage != null
-                                ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(16),
-                                    child: Stack(
-                                      fit: StackFit.expand,
-                                      children: [
-                                        Image.file(
-                                          _profileImage!,
-                                          fit: BoxFit.cover,
-                                          width: double.infinity,
-                                          height: double.infinity,
-                                        ),
-                                        Positioned(
-                                          bottom: 10,
-                                          right: 10,
-                                          child: Container(
-                                            padding: const EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius: BorderRadius.circular(8),
-                                            ),
-                                            child: const Icon(
-                                              Icons.camera_alt,
-                                              color: Color(0xFF006DA4),
-                                              size: 20,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                : Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.camera_alt_outlined,
-                                        size: 50,
-                                        color: Colors.white.withOpacity(0.8),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        'Upload',
-                                        style: TextStyle(
-                                          color: Colors.white.withOpacity(0.8),
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                          ),
-                        ),
-                      ),
-                      
-                      const SizedBox(height: 24),
-                      
-                      // Full Name Field
-                      CustomTextField(
-                        label: 'Full Name',
-                        hint: 'Enter your full name',
-                        controller: _nameController,
-                      ),
-                      
-                      const SizedBox(height: 16),
-                      
-                      // Email Field
-                      CustomTextField(
-                        label: 'Email',
-                        hint: 'Enter your email',
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      
-                      const SizedBox(height: 16),
-                      
-                      // Phone Number Field
-                      CustomTextField(
-                        label: 'Phone Number',
-                        hint: 'Enter your phone number',
-                        controller: _phoneController,
-                        keyboardType: TextInputType.phone,
-                      ),
-                      
-                      const SizedBox(height: 32),
-                      
-                      // Update Profile Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _updateProfile,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: const Color(0xFF006DA4),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+
+                            const SizedBox(height: 24),
+
+                            // Full Name Field
+                            CustomTextField(
+                              label: 'Full Name',
+                              hint: 'Enter your full name',
+                              controller: _nameController,
                             ),
-                            elevation: 0,
-                          ),
-                          child: _isLoading
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Color(0xFF006DA4),
+
+                            const SizedBox(height: 16),
+
+                            // Email Field
+                            CustomTextField(
+                              label: 'Email',
+                              hint: 'Enter your email',
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // Phone Number Field
+                            CustomTextField(
+                              label: 'Phone Number',
+                              hint: 'Enter your phone number',
+                              controller: _phoneController,
+                              keyboardType: TextInputType.phone,
+                            ),
+
+                            const SizedBox(height: 32),
+
+                            // Update Profile Button
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: _isLoading ? null : _updateProfile,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: const Color(0xFF006DA4),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                )
-                              : const Text(
-                                  'Update Profile',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                  elevation: 0,
                                 ),
+                                child: _isLoading
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Color(0xFF006DA4),
+                                        ),
+                                      )
+                                    : const Text(
+                                        'Update Profile',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
               ),
             ],
           ),
@@ -558,7 +573,8 @@ class _ProfileViewState extends State<ProfileView> {
           } else if (index == 1) {
             Navigator.of(context).pushReplacementNamed(AppRouter.allDoctors);
           } else if (index == 2) {
-            Navigator.of(context).pushReplacementNamed(AppRouter.allAppointments);
+            Navigator.of(context)
+                .pushReplacementNamed(AppRouter.allAppointments);
           } else if (index == 3) {
             // Already on profile
           }

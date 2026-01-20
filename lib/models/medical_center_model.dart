@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class MedicalCenterModel {
   final String id;
   final String name;
@@ -6,7 +8,7 @@ class MedicalCenterModel {
   final List<String> services;
   final String location;
   final String phone;
-  final Map<String, String> timings; 
+  final Map<String, String> timings;
   final String email;
 
   MedicalCenterModel({
@@ -20,6 +22,36 @@ class MedicalCenterModel {
     required this.timings,
     required this.email,
   });
+
+  // Convert to Map for SQLite
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'imagePath': imagePath,
+      'services': jsonEncode(services),
+      'location': location,
+      'phone': phone,
+      'timings': jsonEncode(timings),
+      'email': email,
+    };
+  }
+
+  // Create from Map (SQLite)
+  factory MedicalCenterModel.fromMap(Map<String, dynamic> map) {
+    return MedicalCenterModel(
+      id: map['id'] ?? '',
+      name: map['name'] ?? '',
+      description: map['description'] ?? '',
+      imagePath: map['imagePath'] ?? '',
+      services: List<String>.from(jsonDecode(map['services'] ?? '[]')),
+      location: map['location'] ?? '',
+      phone: map['phone'] ?? '',
+      timings: Map<String, String>.from(jsonDecode(map['timings'] ?? '{}')),
+      email: map['email'] ?? '',
+    );
+  }
 
   static List<MedicalCenterModel> getMedicalCenters() {
     return [
@@ -46,9 +78,7 @@ class MedicalCenterModel {
         services: ['General Medicine', 'Pediatrics', 'Emergency Care'],
         location: '123 Main Street, New York, NY 10001, USA',
         phone: '+1 (212) 555-1234',
-        timings: {
-          'Mon-Sun': '24-7'
-        },
+        timings: {'Mon-Sun': '24-7'},
         email: 'info@cityhealthcenter.com',
       ),
       MedicalCenterModel(
@@ -60,9 +90,7 @@ class MedicalCenterModel {
         services: ['Cardiology', 'Orthopedics', 'Dermatology'],
         location: '456 Health Avenue, Chicago, IL 60601, USA',
         phone: '+1 (312) 555-5678',
-        timings: {
-          'Mon-Sun': '24-7'
-        },
+        timings: {'Mon-Sun': '24-7'},
         email: 'contact@wellnessmedicalhub.com',
       ),
       MedicalCenterModel(
@@ -74,9 +102,7 @@ class MedicalCenterModel {
         services: ['Family Medicine', 'Mental Health', 'Preventive Care'],
         location: '789 Care Boulevard, Houston, TX 77001, USA',
         phone: '+1 (713) 555-9012',
-        timings: {
-        'Mon-Sun': '24-7'
-        },
+        timings: {'Mon-Sun': '24-7'},
         email: 'info@communitycarecenter.org',
       ),
     ];

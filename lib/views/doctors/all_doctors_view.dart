@@ -390,15 +390,16 @@ class _AllDoctorsViewState extends State<AllDoctorsView> {
           setState(() {
             _bottomNavIndex = index;
           });
-          if (index == 0)
+          if (index == 0) {
             Navigator.of(context).pushReplacementNamed(AppRouter.home);
-          if (index == 1) {/* already here */}
-          if (index == 2) {
+          } else if (index == 1) {
+            // Already here
+          } else if (index == 2) {
             Navigator.of(context)
                 .pushReplacementNamed(AppRouter.allAppointments);
+          } else if (index == 3) {
+            Navigator.of(context).pushNamed(AppRouter.profile);
           }
-          if (index == 3)
-            Navigator.of(context).pushReplacementNamed(AppRouter.home);
         },
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.transparent,

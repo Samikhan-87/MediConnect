@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:mediconnect/routes/app_router.dart';
 import 'package:mediconnect/theme/app_theme.dart';
 

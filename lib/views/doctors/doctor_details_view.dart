@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mediconnect/models/doctor_model.dart';
+import 'package:mediconnect/models/appointment_model.dart';
 import 'package:mediconnect/routes/app_router.dart';
+import 'package:mediconnect/services/appointment_service.dart';
 
 class DoctorDetailsView extends StatefulWidget {
   final DoctorModel doctor;
@@ -13,6 +15,8 @@ class DoctorDetailsView extends StatefulWidget {
 
 class _DoctorDetailsViewState extends State<DoctorDetailsView> {
   String? selectedDay;
+  final AppointmentService _appointmentService = AppointmentService();
+  bool _isBooking = false;
 
   final Map<String, String> timings = {
     'Sun': '10.00 AM - 12:00 PM',
@@ -377,7 +381,63 @@ class _DoctorDetailsViewState extends State<DoctorDetailsView> {
     );
   }
 
-  void _showAppointmentConfirmationDialog(BuildContext context) {
+  void _showAppointmentConfirmationDialog(BuildContext context) async {
+    if (_isBooking) return;
+
+    setState(() => _isBooking = true);
+
+    // Calculate the appointment date based on selected day
+    final now = DateTime.now();
+    final dayMap = {
+      'Sun': DateTime.sunday,
+      'Mon': DateTime.monday,
+      'Tue': DateTime.tuesday,
+      'Wed': DateTime.wednesday,
+      'Thu': DateTime.thursday,
+      'Fri': DateTime.friday,
+      'Sat': DateTime.saturday
+    };
+    final targetDay = dayMap[selectedDay] ?? DateTime.monday;
+
+    // Find the next occurrence of the selected day
+    int daysUntil = (targetDay - now.weekday + 7) % 7;
+    if (daysUntil == 0)
+      daysUntil = 7; // If today is the selected day, book for next week
+    final appointmentDate = now.add(Duration(days: daysUntil));
+
+    // Create the appointment
+    final appointment = AppointmentModel(
+      id: _appointmentService.generateAppointmentId(),
+      doctorId: widget.doctor.id,
+      doctorName: widget.doctor.name,
+      doctorSpecialty: widget.doctor.specialty,
+      doctorImagePath: widget.doctor.imagePath,
+      day: selectedDay!,
+      time: timings[selectedDay] ?? '10:00 AM - 12:00 PM',
+      location: 'Trusted Healthcare, 2140 Westwood Blvd, Los Angeles',
+      appointmentDate: appointmentDate,
+      isCompleted: false,
+    );
+
+    // Book the appointment using the service
+    final success = await _appointmentService.bookAppointment(appointment);
+
+    setState(() => _isBooking = false);
+
+    if (!success) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to book appointment. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      return;
+    }
+
+    if (!context.mounted) return;
+
     showDialog(
       context: context,
       barrierDismissible: false,

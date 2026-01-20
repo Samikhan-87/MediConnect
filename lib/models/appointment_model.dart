@@ -9,6 +9,7 @@ class AppointmentModel {
   final String location;
   final DateTime appointmentDate;
   final bool isCompleted;
+  final String? userId;
 
   AppointmentModel({
     required this.id,
@@ -21,12 +22,76 @@ class AppointmentModel {
     required this.location,
     required this.appointmentDate,
     this.isCompleted = false,
+    this.userId,
   });
 
   // Check if appointment is current (upcoming) or previous
   bool get isCurrent => appointmentDate.isAfter(DateTime.now()) && !isCompleted;
   bool get isPrevious =>
       appointmentDate.isBefore(DateTime.now()) || isCompleted;
+
+  // Convert to Map for SQLite
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'doctorId': doctorId,
+      'doctorName': doctorName,
+      'doctorSpecialty': doctorSpecialty,
+      'doctorImagePath': doctorImagePath,
+      'day': day,
+      'time': time,
+      'location': location,
+      'appointmentDate': appointmentDate.toIso8601String(),
+      'isCompleted': isCompleted ? 1 : 0,
+      'userId': userId,
+    };
+  }
+
+  
+  factory AppointmentModel.fromMap(Map<String, dynamic> map) {
+    return AppointmentModel(
+      id: map['id'] ?? '',
+      doctorId: map['doctorId'] ?? '',
+      doctorName: map['doctorName'] ?? '',
+      doctorSpecialty: map['doctorSpecialty'] ?? '',
+      doctorImagePath: map['doctorImagePath'] ?? '',
+      day: map['day'] ?? '',
+      time: map['time'] ?? '',
+      location: map['location'] ?? '',
+      appointmentDate: DateTime.parse(map['appointmentDate']),
+      isCompleted: map['isCompleted'] == 1,
+      userId: map['userId'],
+    );
+  }
+
+  // Copy with method for updating
+  AppointmentModel copyWith({
+    String? id,
+    String? doctorId,
+    String? doctorName,
+    String? doctorSpecialty,
+    String? doctorImagePath,
+    String? day,
+    String? time,
+    String? location,
+    DateTime? appointmentDate,
+    bool? isCompleted,
+    String? userId,
+  }) {
+    return AppointmentModel(
+      id: id ?? this.id,
+      doctorId: doctorId ?? this.doctorId,
+      doctorName: doctorName ?? this.doctorName,
+      doctorSpecialty: doctorSpecialty ?? this.doctorSpecialty,
+      doctorImagePath: doctorImagePath ?? this.doctorImagePath,
+      day: day ?? this.day,
+      time: time ?? this.time,
+      location: location ?? this.location,
+      appointmentDate: appointmentDate ?? this.appointmentDate,
+      isCompleted: isCompleted ?? this.isCompleted,
+      userId: userId ?? this.userId,
+    );
+  }
 
   // Sample appointments data
   static List<AppointmentModel> getAppointments() {

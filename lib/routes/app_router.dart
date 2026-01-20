@@ -10,6 +10,11 @@ import 'package:mediconnect/views/doctors/all_doctors_view.dart';
 import 'package:mediconnect/views/doctors/doctor_details_view.dart';
 import 'package:mediconnect/views/appointments/all_appointments_view.dart';
 import 'package:mediconnect/views/profile/profile_view.dart';
+import 'package:mediconnect/views/settings/settings_view.dart';
+import 'package:mediconnect/views/settings/change_password_view.dart';
+import 'package:mediconnect/views/about/about_view.dart';
+import 'package:mediconnect/views/privacy/privacy_policy_view.dart';
+import 'package:mediconnect/views/terms/terms_conditions_view.dart';
 import 'package:mediconnect/views/onboarding/onboarding_view.dart';
 import 'package:mediconnect/views/splash/splash_view.dart';
 
@@ -26,6 +31,11 @@ class AppRouter {
   static const String doctorDetails = '/doctor-details';
   static const String allAppointments = '/appointments';
   static const String profile = '/profile';
+  static const String settings = '/settings';
+  static const String changePassword = '/change-password';
+  static const String about = '/about';
+  static const String privacyPolicy = '/privacy-policy';
+  static const String termsConditions = '/terms-conditions';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -49,6 +59,16 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const AllAppointmentsView());
       case profile:
         return MaterialPageRoute(builder: (_) => const ProfileView());
+      case AppRouter.settings:
+        return MaterialPageRoute(builder: (_) => const SettingsView());
+      case changePassword:
+        return MaterialPageRoute(builder: (_) => const ChangePasswordView());
+      case about:
+        return MaterialPageRoute(builder: (_) => const AboutView());
+      case privacyPolicy:
+        return MaterialPageRoute(builder: (_) => const PrivacyPolicyView());
+      case termsConditions:
+        return MaterialPageRoute(builder: (_) => const TermsConditionsView());
       case medicalCenterDetails:
         final medicalCenter = settings.arguments as MedicalCenterModel;
         return MaterialPageRoute(

@@ -17,6 +17,32 @@ class DoctorModel {
     required this.experienceYears,
   });
 
+  // Convert to Map for SQLite
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'specialty': specialty,
+      'description': description,
+      'rating': rating,
+      'imagePath': imagePath,
+      'experienceYears': experienceYears,
+    };
+  }
+
+  // Create from Map (SQLite)
+  factory DoctorModel.fromMap(Map<String, dynamic> map) {
+    return DoctorModel(
+      id: map['id'] ?? '',
+      name: map['name'] ?? '',
+      specialty: map['specialty'] ?? '',
+      description: map['description'] ?? '',
+      rating: (map['rating'] ?? 0).toDouble(),
+      imagePath: map['imagePath'] ?? '',
+      experienceYears: map['experienceYears'] ?? 0,
+    );
+  }
+
   static List<DoctorModel> getTopRatedDoctors() {
     return [
       DoctorModel(

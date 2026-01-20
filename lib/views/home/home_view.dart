@@ -664,7 +664,7 @@ class _HomeViewState extends State<HomeView> {
                         title: 'Settings',
                         onTap: () {
                           Navigator.of(context).pop();
-                          // Navigate to Settings
+                          Navigator.of(context).pushNamed(AppRouter.settings);
                         },
                       ),
                       const SizedBox(height: 8),
@@ -673,7 +673,7 @@ class _HomeViewState extends State<HomeView> {
                         title: 'About',
                         onTap: () {
                           Navigator.of(context).pop();
-                          // Navigate to About
+                          Navigator.of(context).pushNamed(AppRouter.about);
                         },
                       ),
                       const SizedBox(height: 8),
@@ -682,7 +682,7 @@ class _HomeViewState extends State<HomeView> {
                         title: 'Privacy Policy',
                         onTap: () {
                           Navigator.of(context).pop();
-                          // Navigate to Privacy Policy
+                          Navigator.of(context).pushNamed(AppRouter.privacyPolicy);
                         },
                       ),
                       const SizedBox(height: 8),
@@ -691,7 +691,7 @@ class _HomeViewState extends State<HomeView> {
                         title: 'Terms and Conditions',
                         onTap: () {
                           Navigator.of(context).pop();
-                          // Navigate to Terms and Conditions
+                          Navigator.of(context).pushNamed(AppRouter.termsConditions);
                         },
                       ),
                     ],
