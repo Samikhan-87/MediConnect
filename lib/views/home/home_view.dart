@@ -44,7 +44,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     final medicalCenters = MedicalCenterModel.getMedicalCenters();
-    final topDoctors = DoctorModel.getTopRatedDoctors().where((d) => d.rating >= 4.0).toList();
+    final doctors = DoctorModel.getTopRatedDoctors();
 
     return Scaffold(
       key: _scaffoldKey,
@@ -71,7 +71,7 @@ class _HomeViewState extends State<HomeView> {
 
               // Top Rated Doctors Section
               Expanded(
-                child: _buildDoctorsSection(topDoctors),
+                child: _buildDoctorsSection(doctors),
               ),
             ],
           ),
@@ -100,7 +100,7 @@ class _HomeViewState extends State<HomeView> {
                 ),
                 child: ClipOval(
                   child: Image.asset(
-                    'assets/images/MediCenterImages/Rectangle 1494.png',
+                    'assets\images\ChatGPT Image Jul 25, 2025, 03_35_38 PM.png',
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       // Fallback to icon if image fails to load
@@ -318,7 +318,7 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget _buildDoctorsSection(List<DoctorModel> topDoctors) {
+  Widget _buildDoctorsSection(List<DoctorModel> doctors) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -336,9 +336,9 @@ class _HomeViewState extends State<HomeView> {
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            itemCount: topDoctors.length,
+            itemCount: doctors.length,
             itemBuilder: (context, index) {
-              final doctor = topDoctors[index];
+              final doctor = doctors[index];
               return _buildDoctorCard(doctor);
             },
           ),
@@ -457,7 +457,10 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.of(context).pushNamed(AppRouter.doctorDetails, arguments: doctor);
+                        Navigator.of(context).pushNamed(
+                          AppRouter.doctorDetails,
+                          arguments: doctor,
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF006DA4),
