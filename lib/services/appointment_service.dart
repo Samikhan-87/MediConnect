@@ -120,7 +120,7 @@ class AppointmentService extends ChangeNotifier {
   Future<bool> cancelAppointment(String appointmentId) async {
     try {
       final userId = await _getCurrentUserId();
-      
+
       // Find the appointment in current list
       final index =
           _currentAppointments.indexWhere((a) => a.id == appointmentId);

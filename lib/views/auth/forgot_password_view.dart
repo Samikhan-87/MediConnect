@@ -51,7 +51,8 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Password reset email sent! Please check your inbox.'),
+            content:
+                Text('Password reset email sent! Please check your inbox.'),
             backgroundColor: Colors.green,
           ),
         );
