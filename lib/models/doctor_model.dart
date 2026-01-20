@@ -25,7 +25,7 @@ class DoctorModel {
         specialty: 'Dentist',
         description:
             'Experienced dentist providing reliable oral care and helping patients achieve their dental goals.',
-        rating: 5.0,
+        rating: 5,
         imagePath: 'assets/images/MedicalCenterImages/Rectangle 1512.png',
         experienceYears: 8,
       ),
@@ -35,7 +35,7 @@ class DoctorModel {
         specialty: 'Cardiologist',
         description:
             'Dr. Zoya is an experienced cardiologist specializing in heart health and cardiovascular care.',
-        rating: 4.0,
+        rating: 4,
         imagePath: 'assets/images/MedicalCenterImages/Rectangle 1513.png',
         experienceYears: 5,
       ),
@@ -45,7 +45,7 @@ class DoctorModel {
         specialty: 'Orthopedic Surgeon',
         description:
             'Dr. Andrew Collins is a highly skilled orthopedic surgeon specializing in musculoskeletal care.',
-        rating: 5.0,
+        rating: 3,
         imagePath: 'assets/images/MedicalCenterImages/Rectangle 1494.png',
         experienceYears: 12,
       ),
@@ -55,7 +55,7 @@ class DoctorModel {
         specialty: 'Dentist',
         description:
             'General dentist focused on preventive care and cosmetic dentistry.',
-        rating: 4.2,
+        rating: 4,
         imagePath: 'assets/images/DoctorImages/doctor1.png',
         experienceYears: 4,
       ),
@@ -65,7 +65,7 @@ class DoctorModel {
         specialty: 'Surgeon',
         description:
             'General surgeon with experience in minimally invasive procedures.',
-        rating: 3.8,
+        rating: 3,
         imagePath: 'assets/images/DoctorImages/doctor2.png',
         experienceYears: 9,
       ),
@@ -75,7 +75,7 @@ class DoctorModel {
         specialty: 'Cardiologist',
         description:
             'Cardiologist focusing on preventive cardiology and heart failure management.',
-        rating: 4.6,
+        rating: 2,
         imagePath: 'assets/images/DoctorImages/doctor3.png',
         experienceYears: 7,
       ),
@@ -85,7 +85,7 @@ class DoctorModel {
         specialty: 'Surgeon',
         description:
             'Experienced surgeon with expertise in laparoscopic techniques.',
-        rating: 3.3,
+        rating: 3,
         imagePath: 'assets/images/DoctorImages/doctor4.png',
         experienceYears: 6,
       ),
@@ -95,7 +95,7 @@ class DoctorModel {
         specialty: 'Dermatologist',
         description:
             'Dermatologist specializing in medical and cosmetic dermatology.',
-        rating: 4.1,
+        rating: 4,
         imagePath: 'assets/images/DoctorImages/doctor5.png',
         experienceYears: 3,
       ),
@@ -105,7 +105,7 @@ class DoctorModel {
         specialty: 'Pediatrician',
         description:
             'Compassionate pediatrician providing care for children of all ages.',
-        rating: 4.7,
+        rating: 4,
         imagePath: 'assets/images/DoctorImages/doctor6.png',
         experienceYears: 10,
       ),
@@ -114,7 +114,7 @@ class DoctorModel {
         name: 'Dr. Elena Rossi',
         specialty: 'Surgeon',
         description: 'Specialist in reconstructive and cosmetic surgery.',
-        rating: 4.9,
+        rating: 5,
         imagePath: 'assets/images/DoctorImages/doctor7.png',
         experienceYears: 11,
       ),

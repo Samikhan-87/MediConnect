@@ -26,6 +26,13 @@ class _HomeViewState extends State<HomeView> {
     _loadUserName();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reload user name when returning to this screen
+    _loadUserName();
+  }
+
   Future<void> _loadUserName() async {
     final user = await _authController.getCurrentUser();
     if (user != null && user['name'] != null) {
@@ -514,6 +521,16 @@ class _HomeViewState extends State<HomeView> {
             Navigator.of(context).pushNamed(AppRouter.allDoctors);
             return;
           }
+          if (index == 2) {
+            // Open the appointments screen
+            Navigator.of(context).pushNamed(AppRouter.allAppointments);
+            return;
+          }
+          if (index == 3) {
+            // Open the profile screen
+            Navigator.of(context).pushNamed(AppRouter.profile);
+            return;
+          }
           setState(() {
             _currentIndex = index;
           });
@@ -533,19 +550,23 @@ class _HomeViewState extends State<HomeView> {
         ),
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.medical_services),
+            icon: Icon(Icons.medical_services_outlined),
+            activeIcon: Icon(Icons.medical_services),
             label: 'Doctors',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.access_time),
+            icon: Icon(Icons.calendar_today_outlined),
+            activeIcon: Icon(Icons.calendar_today),
             label: 'Appointments',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
+            activeIcon: Icon(Icons.person),
             label: 'Profile',
           ),
         ],
@@ -629,6 +650,15 @@ class _HomeViewState extends State<HomeView> {
                   child: ListView(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     children: [
+                      _buildDrawerItem(
+                        icon: Icons.person,
+                        title: 'Profile',
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pushNamed(AppRouter.profile);
+                        },
+                      ),
+                      const SizedBox(height: 8),
                       _buildDrawerItem(
                         icon: Icons.settings,
                         title: 'Settings',

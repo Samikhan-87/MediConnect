@@ -211,7 +211,7 @@ class _AllDoctorsViewState extends State<AllDoctorsView> {
                   itemCount: _categories.length,
                 ),
               ),
-              const SizedBox(height: 24), 
+              const SizedBox(height: 24),
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -250,20 +250,22 @@ class _AllDoctorsViewState extends State<AllDoctorsView> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Doctor Image - Square box
           Container(
-            width: 80,
-            height: 80,
+            width: 90,
+            height: 100,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(12),
               color: Colors.grey[200],
             ),
-            child: ClipOval(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
               child: doctor.imagePath.isNotEmpty
                   ? Image.asset(
                       doctor.imagePath,
                       fit: BoxFit.cover,
-                      width: 80,
-                      height: 80,
+                      width: 90,
+                      height: 100,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           color: Colors.grey[200],
@@ -391,7 +393,10 @@ class _AllDoctorsViewState extends State<AllDoctorsView> {
           if (index == 0)
             Navigator.of(context).pushReplacementNamed(AppRouter.home);
           if (index == 1) {/* already here */}
-          if (index == 2) {/* appointments - implement if needed */}
+          if (index == 2) {
+            Navigator.of(context)
+                .pushReplacementNamed(AppRouter.allAppointments);
+          }
           if (index == 3)
             Navigator.of(context).pushReplacementNamed(AppRouter.home);
         },
@@ -401,13 +406,26 @@ class _AllDoctorsViewState extends State<AllDoctorsView> {
         selectedItemColor: const Color(0xFF003366),
         unselectedItemColor: Colors.grey,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.medical_services), label: 'Doctors'),
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
+            label: 'Home',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.access_time), label: 'Appointments'),
+            icon: Icon(Icons.medical_services_outlined),
+            activeIcon: Icon(Icons.medical_services),
+            label: 'Doctors',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline), label: 'Profile'),
+            icon: Icon(Icons.calendar_today_outlined),
+            activeIcon: Icon(Icons.calendar_today),
+            label: 'Appointments',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            activeIcon: Icon(Icons.person),
+            label: 'Profile',
+          ),
         ],
       ),
     );
@@ -425,17 +443,29 @@ class _AllDoctorsViewState extends State<AllDoctorsView> {
         int? localExp = _selectedExperience;
         return StatefulBuilder(builder: (context, setModalState) {
           return Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Filters',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                const Center(
+                  child: Text(
+                    'Filters',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF003366),
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 12),
-                const Text('By Ratings'),
+                const SizedBox(height: 24),
+                const Text(
+                  'By Ratings',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF003366),
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -455,8 +485,14 @@ class _AllDoctorsViewState extends State<AllDoctorsView> {
                     onChanged: (v) => setModalState(() => localRating = v),
                   ),
                 ),
-                const SizedBox(height: 12),
-                const Text('By Experience'),
+                const SizedBox(height: 16),
+                const Text(
+                  'By Experience',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF003366),
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -482,7 +518,21 @@ class _AllDoctorsViewState extends State<AllDoctorsView> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Cancel'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          side: const BorderSide(color: Color(0xFF006DA4)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF006DA4),
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -495,7 +545,21 @@ class _AllDoctorsViewState extends State<AllDoctorsView> {
                           });
                           Navigator.of(context).pop();
                         },
-                        child: const Text('Apply'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF006DA4),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Apply',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
                   ],

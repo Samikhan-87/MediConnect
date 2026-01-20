@@ -488,14 +488,17 @@ class _DoctorDetailsViewState extends State<DoctorDetailsView> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                // View Appointments Button (disabled for now)
+                // View Appointments Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: null, // Disabled - appointments screen not ready
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close dialog
+                      Navigator.of(context)
+                          .pushNamed(AppRouter.allAppointments);
+                    },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                      disabledBackgroundColor: Colors.white.withOpacity(0.6),
+                      backgroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -521,7 +524,7 @@ class _DoctorDetailsViewState extends State<DoctorDetailsView> {
 
   void _showRatingScreen(BuildContext context) {
     int selectedRating = 0;
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -552,7 +555,8 @@ class _DoctorDetailsViewState extends State<DoctorDetailsView> {
                         child: Row(
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.arrow_back, color: Colors.white),
+                              icon: const Icon(Icons.arrow_back,
+                                  color: Colors.white),
                               onPressed: () => Navigator.of(context).pop(),
                             ),
                             const Expanded(
@@ -570,9 +574,9 @@ class _DoctorDetailsViewState extends State<DoctorDetailsView> {
                           ],
                         ),
                       ),
-                      
+
                       const SizedBox(height: 60),
-                      
+
                       // Stars
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -584,83 +588,194 @@ class _DoctorDetailsViewState extends State<DoctorDetailsView> {
                               });
                             },
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
                               child: Icon(
-                                index < selectedRating ? Icons.star : Icons.star_border,
+                                index < selectedRating
+                                    ? Icons.star
+                                    : Icons.star_border,
                                 size: 50,
-                                color: index < selectedRating 
-                                    ? Colors.amber 
+                                color: index < selectedRating
+                                    ? Colors.amber
                                     : Colors.white.withOpacity(0.5),
                               ),
                             ),
                           );
                         }),
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Rating Text
-                    Text(
-                      '$selectedRating/5',
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                      Text(
+                        '$selectedRating/5',
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    
-                    const Spacer(),
-                    
-                    // Submit Button
-                    Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: selectedRating > 0
-                              ? () {
-                                  Navigator.of(context).pop();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Thank you for rating ${widget.doctor.name} $selectedRating stars!',
-                                      ),
-                                      backgroundColor: Colors.green,
-                                    ),
-                                  );
-                                }
-                              : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            disabledBackgroundColor: Colors.white.withOpacity(0.6),
-                            foregroundColor: const Color(0xFF003366),
-                            padding: const EdgeInsets.symmetric(vertical: 18),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
+
+                      const Spacer(),
+
+                      // Submit Button
+                      Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: selectedRating > 0
+                                ? () {
+                                    Navigator.of(context).pop();
+                                    _showRatingConfirmationDialog(context);
+                                  }
+                                : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              disabledBackgroundColor:
+                                  Colors.white.withOpacity(0.6),
+                              foregroundColor: const Color(0xFF003366),
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              elevation: 0,
                             ),
-                            elevation: 0,
-                          ),
-                          child: Text(
-                            'Submit Rating',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: selectedRating > 0 
-                                  ? const Color(0xFF003366) 
-                                  : const Color(0xFF003366).withOpacity(0.5),
+                            child: Text(
+                              'Submit Rating',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: selectedRating > 0
+                                    ? const Color(0xFF003366)
+                                    : const Color(0xFF003366).withOpacity(0.5),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    
-                    const SizedBox(height: 40),
-                  ],
+
+                      const SizedBox(height: 40),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
+            );
           },
+        );
+      },
+    );
+  }
+
+  void _showRatingConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF064564),
+                  Color(0xFF006DA4),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Close button
+                Align(
+                  alignment: Alignment.topRight,
+                  child: GestureDetector(
+                    onTap: () => Navigator.of(dialogContext).pop(),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                // Logo from splash screen
+                Image.asset(
+                  'assets/images/logo.png',
+                  width: 140,
+                  height: 140,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(
+                      Icons.star,
+                      size: 80,
+                      color: Colors.white,
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+                // Title
+                const Text(
+                  'Ratings Submitted',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Subtitle
+                Text(
+                  'Your Ratings For This Doctor Has\nBeen Submitted Successfully.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white.withOpacity(0.9),
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 28),
+                // Back To Doctor Details Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(dialogContext).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFF003366),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Back To Doctor Details',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF003366),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
     );

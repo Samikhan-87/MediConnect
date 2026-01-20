@@ -8,6 +8,8 @@ import 'package:mediconnect/views/medical_center/medical_center_details_view.dar
 import 'package:mediconnect/views/notifications/notifications_view.dart';
 import 'package:mediconnect/views/doctors/all_doctors_view.dart';
 import 'package:mediconnect/views/doctors/doctor_details_view.dart';
+import 'package:mediconnect/views/appointments/all_appointments_view.dart';
+import 'package:mediconnect/views/profile/profile_view.dart';
 import 'package:mediconnect/views/onboarding/onboarding_view.dart';
 import 'package:mediconnect/views/splash/splash_view.dart';
 
@@ -22,6 +24,8 @@ class AppRouter {
   static const String allDoctors = '/doctors';
   static const String medicalCenterDetails = '/medical-center-details';
   static const String doctorDetails = '/doctor-details';
+  static const String allAppointments = '/appointments';
+  static const String profile = '/profile';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -41,6 +45,10 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const NotificationsView());
       case allDoctors:
         return MaterialPageRoute(builder: (_) => const AllDoctorsView());
+      case allAppointments:
+        return MaterialPageRoute(builder: (_) => const AllAppointmentsView());
+      case profile:
+        return MaterialPageRoute(builder: (_) => const ProfileView());
       case medicalCenterDetails:
         final medicalCenter = settings.arguments as MedicalCenterModel;
         return MaterialPageRoute(
